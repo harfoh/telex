@@ -21,15 +21,11 @@ namespace MauiApp1
         {
             base.OnAppearing();
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-
-            string text = "This is a Toast";
+            string text = "Telex notification";
             ToastDuration duration = ToastDuration.Short;
             double fontSize = 14;
 
-            var toast = Toast.Make(text, duration, fontSize);
-
-            await toast.Show(cancellationTokenSource.Token);
+            await DisplayToast(text, duration, fontSize);
         }
 
         private async Task InjectJSEventListener()
@@ -53,6 +49,14 @@ namespace MauiApp1
         {
             if( TWebView.CanGoBack)
                 TWebView.GoBack();
+        }
+
+        private static async Task DisplayToast (string text, ToastDuration duration, double fontSize = 14)
+        {
+            
+            var toast = Toast.Make(text, duration, fontSize);
+
+            await toast.Show();
         }
     }
 
