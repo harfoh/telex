@@ -15,7 +15,7 @@ jobs:
 # >>>>>>> Android build <<<<<<< #
 # ***************************** #
   maui-android:
-    runs-on: ubuntu-latest
+    runs-on: windows-2022
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -33,23 +33,22 @@ jobs:
         java-version: '11'
 
     - name: Generate version number using date and run number
-      shell: bash
+      shell: pwsh
       id: version-creator
       run: |
-        buildDay=$(date +"%Y.%m%d")
-        ver="$buildDay.${GITHUB_RUN_NUMBER}.0"
+        $buildDay = Get-Date -Format "yyyy.Mdd"
+        $ver = $buildDay + "." + $env:GITHUB_RUN_NUMBER + ".0"
         echo "APP_VERSION=$ver" >> $GITHUB_OUTPUT
-
     - name: Install MAUI workloads (required for GitHub-hosted runners)
-      shell: bash
+      shell: pwsh
       run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
     - name: Restore NuGet packages
-      shell: bash
+      shell: pwsh
       run: dotnet restore ${{ env.PROJECT_PATH }}  #--configfile ${{ env.NUGETCONFIG_PATH }}
 
     - name: Build Maui Android project
-      shell: bash
+      shell: pwsh
       run: dotnet build ${{ env.PROJECT_PATH }} -c Debug --no-restore -p:PublishTrimmed=False
 
 
@@ -77,10 +76,9 @@ jobs:
       shell: pwsh
       id: version-creator
       run: |
-        buildDay=$(date +"%Y.%m%d")
-        ver="$buildDay.${GITHUB_RUN_NUMBER}.0"
+        $buildDay = Get-Date -Format "yyyy.Mdd"
+        $ver = $buildDay + "." + $env:GITHUB_RUN_NUMBER + ".0"
         echo "APP_VERSION=$ver" >> $GITHUB_OUTPUT
-
     - name: Install MAUI workloads (required for GitHub-hosted runners)
       shell: pwsh
       run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
@@ -98,7 +96,7 @@ jobs:
 # >>>>>>> iOS Build <<<<<<< #
 # ************************* #
   maui-ios:
-    runs-on: macos-latest
+    runs-on: macos-12
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -123,9 +121,8 @@ jobs:
         ver="${buildDay}.${GITHUB_RUN_NUMBER}.0"
         echo $ver
         echo "APP_VERSION=$ver" >> $GITHUB_ENV
-
     - name: Install MAUI workloads (required for GitHub-hosted runners)
-      shell: bash
+      shell: pwsh
       run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
     - name: Restore NuGet packages
@@ -141,7 +138,7 @@ jobs:
 # >>>>>>> MacCatalyst Build <<<<<<< #
 # ********************************* #
   maui-macos:
-    runs-on: macos-latest
+    runs-on: macos-12
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -166,9 +163,8 @@ jobs:
         ver="${buildDay}.${GITHUB_RUN_NUMBER}.0"
         echo $ver
         echo "APP_VERSION=$ver" >> $GITHUB_ENV
-
     - name: Install MAUI workloads (required for GitHub-hosted runners)
-      shell: bash
+      shell: pwsh
       run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
     - name: Restore NuGet packages
