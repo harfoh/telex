@@ -3,10 +3,11 @@ name: Build MAUI Project
 on:
   workflow_dispatch:
   push:
+    tags:
+      - 'v*.*.*'
     branches:
       - main
-      tags:
-        - 'v*.*.*' 
+ 
 
 env:
   PROJECT_PATH: "MauiApp1.sln"
