@@ -6,7 +6,9 @@ on:
     tags:
       - 'v*.*.*'
  
-
+permissions:
+  contents: write
+  
 env:
   PROJECT_PATH: "MauiApp1.sln"
 
