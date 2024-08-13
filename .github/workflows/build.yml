@@ -57,7 +57,7 @@ jobs:
 # >>>>>>> Windows Build <<<<<<< #
 # ***************************** #
   maui-windows:
-    runs-on: ubuntu-latest
+    runs-on: windows-2022
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -74,7 +74,7 @@ jobs:
       uses: microsoft/setup-msbuild@v1.3.2
 
     - name: Generate version number using date and run number
-      shell: bash
+      shell: pwsh
       id: version-creator
       run: |
         buildDay=$(date +"%Y.%m%d")
@@ -82,15 +82,15 @@ jobs:
         echo "APP_VERSION=$ver" >> $GITHUB_OUTPUT
 
     - name: Install MAUI workloads (required for GitHub-hosted runners)
-      shell: bash
+      shell: pwsh
       run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
     - name: Restore NuGet packages
-      shell: bash
+      shell: pwsh
       run: dotnet restore ${{ env.PROJECT_PATH }}  #--configfile ${{ env.NUGETCONFIG_PATH }}
 
     - name: Build Maui WinUI project
-      shell: bash
+      shell: pwsh
       run: dotnet build ${{ env.PROJECT_PATH }} -c Debug -f net8.0-windows10.0.19041.0 -p:PublishTrimmed=False
 
 
