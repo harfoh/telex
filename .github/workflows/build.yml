@@ -45,7 +45,7 @@ jobs:
         run: dotnet workload install maui
       - name: Restore NuGet packages
         shell: pwsh
-        run: dotnet restore ${{ env.PROJECT_PATH }} -r win-x64 #--configfile ${{ env.NUGETCONFIG_PATH }}
+        run: dotnet restore ${{ env.PROJECT_PATH }} -r win-x64 -p:PublishReadyToRun=true #--configfile ${{ env.NUGETCONFIG_PATH }}
 
       - name: Build Maui WinUI project
         shell: pwsh
