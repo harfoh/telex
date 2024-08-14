@@ -30,10 +30,9 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'microsoft'
-        java-version: '11'
+    # For WinUI builds
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.3.2
 
     - name: Generate version number using date and run number
       shell: pwsh
@@ -52,7 +51,7 @@ jobs:
 
     - name: Build Maui Android project
       shell: pwsh
-      run: dotnet build ${{ env.PROJECT_PATH }} -c Debug --no-restore -p:PublishTrimmed=False -o ./output/andriod
+      run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -f:net8.0-windows10.0.19041.0 --no-restore -p:PublishTrimmed=True -o ./output/windows
 
     - name: Create Release
       id: create_release
@@ -73,8 +72,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./output/andriod/MauiApp1.dll
-        asset_name: MauiApp1.dll  
+        asset_path: ./output/windows/MauiApp1.exe
+        asset_name: MauiApp1.exe 
         asset_content_type: application/vnd.android.package-archive
 
 
