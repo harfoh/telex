@@ -43,18 +43,23 @@ jobs:
         $buildDay = Get-Date -Format "yyyy.Mdd"
         $ver = $buildDay + "." + $env:GITHUB_RUN_NUMBER + ".0"
         echo "APP_VERSION=$ver" >> $GITHUB_OUTPUT
+
     - name: Install MAUI workloads (required for GitHub-hosted runners)
       shell: pwsh
       run: dotnet workload install maui 
+
     - name: Restore NuGet packages
       shell: pwsh
-      run: dotnet restore ${{ env.PROJECT_PATH }}  #--configfile ${{ env.NUGETCONFIG_PATH }}
+      run: dotnet restore ${{ env.PROJECT_PATH }} 
 
     - name: Build Maui WinUI project
       shell: pwsh
+      run: dotnet publish ${{ env.PROJECT_PATH }} -f net8.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true
+    
+    - name: Zip the publish directory
       run: |
-        dotnet publish ${{ env.PROJECT_PATH }} -f net8.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true
-        ls ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/publish/
+        Compress-Archive -Path ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/publish/* -DestinationPath ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/MauiApp1.zip
+        ls ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/
 
     - name: Create Release
       id: create_release
@@ -75,9 +80,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/publish/MauiApp1.exe
-        asset_name: MauiApp1.exe
-        asset_content_type: application/evnd.microsoft.portable-executable
+        asset_path: ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/publish/MauiApp1.zip
+        asset_name: MauiApp1.zip
+        asset_content_type: application/zip
 
 
 
