@@ -54,7 +54,7 @@ jobs:
       shell: pwsh
       run: |
         dotnet publish ${{ env.PROJECT_PATH }} -f net8.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true
-        ls -al ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/publish/
+        ls ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/publish/
 
     # - name: Create Release
     #   id: create_release
