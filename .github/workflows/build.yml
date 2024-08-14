@@ -43,11 +43,10 @@ jobs:
         echo "APP_VERSION=$ver" >> $GITHUB_OUTPUT
     - name: Install MAUI workloads (required for GitHub-hosted runners)
       shell: pwsh
-      run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
-
+      run: dotnet workload install maui 
     - name: Restore NuGet packages
       shell: pwsh
-      run: dotnet restore ${{ env.PROJECT_PATH }}  #--configfile ${{ env.NUGETCONFIG_PATH }}
+      run: dotnet restore ${{ env.PROJECT_PATH }}  -r win-x64 --self-contained #--configfile ${{ env.NUGETCONFIG_PATH }}
 
     - name: Build Maui WinUI project
       shell: pwsh
