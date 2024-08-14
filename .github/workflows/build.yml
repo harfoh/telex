@@ -75,7 +75,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/publish/
+        asset_path: ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/publish/MauiApp1.exe
         asset_name: MauiApp1.exe
         asset_content_type: application/evnd.microsoft.portable-executable
 
