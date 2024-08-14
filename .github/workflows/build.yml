@@ -1,10 +1,8 @@
-name: Build MAUI Project
+name: Build and Release MAUI Project
 
 on:
   workflow_dispatch:
   push:
-    # branches:
-    #   - main
     tags:
       - 'v*.*.*'
  
@@ -27,14 +25,17 @@ jobs:
       with:
         fetch-depth: 0
 
+
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
 
+
       # For WinUI builds
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.3.2
+
 
     - name: Generate version number using date and run number
       shell: pwsh
@@ -44,22 +45,22 @@ jobs:
         $ver = $buildDay + "." + $env:GITHUB_RUN_NUMBER + ".0"
         echo "APP_VERSION=$ver" >> $GITHUB_OUTPUT
 
+
     - name: Install MAUI workloads (required for GitHub-hosted runners)
       shell: pwsh
       run: dotnet workload install maui 
 
+
     - name: Restore NuGet packages
       shell: pwsh
-      run: dotnet restore ${{ env.PROJECT_PATH }} 
+      run: dotnet restore ${{ env.PROJECT_PATH }}  #--configfile ${{ env.NUGETCONFIG_PATH }}
+
 
     - name: Build Maui WinUI project
       shell: pwsh
-      run: dotnet publish ${{ env.PROJECT_PATH }} -f net8.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true
-    
-    - name: Zip the publish directory
       run: |
-        Compress-Archive -Path ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/publish/* -DestinationPath ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/MauiApp1.zip
-        ls ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/
+        dotnet publish ${{ env.PROJECT_PATH }} -f net8.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true
+
 
     - name: Create Release
       id: create_release
@@ -80,94 +81,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/MauiApp1.zip
-        asset_name: MauiApp1.zip
-        asset_content_type: application/zip
-
-
-
-
-
-
-# # ************************* #
-# # >>>>>>> iOS Build <<<<<<< #
-# # ************************* #
-#   maui-ios:
-#     runs-on: macos-12
-#     steps:
-#     - name: Checkout
-#       uses: actions/checkout@v4
-#       with:
-#         fetch-depth: 0
-
-#     #- uses: maxim-lobanov/setup-xcode@v1
-#     #  with:
-#     #    xcode-version: latest
-
-#     - name: Setup .NET Core SDK
-#       uses: actions/setup-dotnet@v4
-#       with:
-#         dotnet-version: '8.0.x'
-
-#     - name: Generate version number using date and run number
-#       id: version-creator
-#       shell: bash
-#       run: |
-#         buildDay=`date +%Y.%m%d`
-#         echo $buildDay
-#         ver="${buildDay}.${GITHUB_RUN_NUMBER}.0"
-#         echo $ver
-#         echo "APP_VERSION=$ver" >> $GITHUB_ENV
-#     - name: Install MAUI workloads (required for GitHub-hosted runners)
-#       shell: pwsh
-#       run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
-
-#     - name: Restore NuGet packages
-#       shell: bash
-#       run: dotnet restore ${{ env.PROJECT_PATH }} #--configfile ${{ env.NUGETCONFIG_PATH }}
-
-#     - name: Build MAUI iOS project
-#       shell: bash
-#       run: dotnet build ${{ env.PROJECT_PATH }} -c Debug --no-restore -p:PublishTrimmed=True -p:MtouchLink=SdkOnly
-
-
-# # ********************************* #
-# # >>>>>>> MacCatalyst Build <<<<<<< #
-# # ********************************* #
-#   maui-macos:
-#     runs-on: macos-12
-#     steps:
-#     - name: Checkout
-#       uses: actions/checkout@v4
-#       with:
-#         fetch-depth: 0
-
-#     #- uses: maxim-lobanov/setup-xcode@v1
-#     #  with:
-#     #    xcode-version: latest
-
-#     - name: Setup .NET Core SDK
-#       uses: actions/setup-dotnet@v4
-#       with:
-#         dotnet-version: '8.0.x'
-
-#     - name: Generate version number using date and run number
-#       id: version-creator
-#       shell: bash
-#       run: |
-#         buildDay=`date +%Y.%m%d`
-#         echo $buildDay
-#         ver="${buildDay}.${GITHUB_RUN_NUMBER}.0"
-#         echo $ver
-#         echo "APP_VERSION=$ver" >> $GITHUB_ENV
-#     - name: Install MAUI workloads (required for GitHub-hosted runners)
-#       shell: pwsh
-#       run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
-
-#     - name: Restore NuGet packages
-#       shell: bash
-#       run: dotnet restore ${{ env.PROJECT_PATH }} #--configfile ${{ env.NUGETCONFIG_PATH }}
-    
-#     - name: Build MAUI MacCatalyst project
-#       shell: bash
-#       run: dotnet build ${{ env.PROJECT_PATH }} -c Debug --no-restore -p:PublishTrimmed=True -p:MtouchLink=SdkOnly
+        asset_path: ./MauiApp1/bin/Release/net8.0-windows10.0.19041.0/win10-x64/publish/MauiApp1.exe
+        asset_name: MauiApp1.exe
+        asset_content_type: application/evnd.microsoft.portable-executable
