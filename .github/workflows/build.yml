@@ -4,34 +4,35 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - "v*.*.*"
-
+      - 'v*.*.*'
+ 
 permissions:
   contents: write
-
+  
 env:
   PROJECT_PATH: "MauiApp1.sln"
 
 jobs:
-  # ***************************** #
-  # >>>>>>> Windows build <<<<<<< #
-  # ***************************** #
+
+# ***************************** #
+# >>>>>>> Windows build <<<<<<< #
+# ***************************** #
   maui-windows:
     runs-on: windows-2022
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "8.0.x"
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
 
-        # For WinUI builds
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.3.2
+      # For WinUI builds
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.3.2
 
     - name: Generate version number using date and run number
       shell: pwsh
@@ -45,11 +46,11 @@ jobs:
       run: dotnet workload install maui 
     - name: Restore NuGet packages
       shell: pwsh
-      run: dotnet restore ${{ env.PROJECT_PATH }} -r win-x64 #--configfile ${{ env.NUGETCONFIG_PATH }}
+      run: dotnet restore ${{ env.PROJECT_PATH }}  #--configfile ${{ env.NUGETCONFIG_PATH }}
 
     - name: Build Maui WinUI project
       shell: pwsh
-      run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -f:net8.0-windows10.0.19041.0 --no-restore -p:PublishTrimmed=True -o ./output/windows
+      run: dotnet publish ${{ env.PROJECT_PATH }} -f net8.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -69,7 +70,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./output/windows/MauiApp1.exe
+        asset_path: ./bin/Release/net8.0-windows10.0.19041.0/win10-x64/publish/MauiApp1.exe
         asset_name: MauiApp1.exe 
         asset_content_type: application/evnd.microsoft.portable-executable
 
@@ -119,6 +120,7 @@ jobs:
 #       shell: bash
 #       run: dotnet build ${{ env.PROJECT_PATH }} -c Debug --no-restore -p:PublishTrimmed=True -p:MtouchLink=SdkOnly
 
+
 # # ********************************* #
 # # >>>>>>> MacCatalyst Build <<<<<<< #
 # # ********************************* #
@@ -155,7 +157,7 @@ jobs:
 #     - name: Restore NuGet packages
 #       shell: bash
 #       run: dotnet restore ${{ env.PROJECT_PATH }} #--configfile ${{ env.NUGETCONFIG_PATH }}
-
+    
 #     - name: Build MAUI MacCatalyst project
 #       shell: bash
 #       run: dotnet build ${{ env.PROJECT_PATH }} -c Debug --no-restore -p:PublishTrimmed=True -p:MtouchLink=SdkOnly
